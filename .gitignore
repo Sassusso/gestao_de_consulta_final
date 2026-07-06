@@ -1,0 +1,34 @@
+# Dependências
+node_modules/
+npm-debug.log*
+
+# Ambiente
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+*.env.dev
+*.env.local
