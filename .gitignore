@@ -8,6 +8,15 @@ npm-debug.log*
 .env.production
 .env.*.local
 
+api-gestaoconsulta/.env
+api-gestaoconsulta/.env.local   
+api-gestaoconsulta/.env.production  
+api-gestaoconsulta/.env.*
+
+frotend-gestaoconsulta/.env
+frotend-gestaoconsulta/.env.local
+frotend-gestaoconsulta/.env.production
+frotend-gestaoconsulta/.env.*
 # Docker
 *.pid
 docker-compose.override.yml

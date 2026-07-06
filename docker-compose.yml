@@ -1,0 +1,57 @@
+services:
+  backend:
+    build:
+      context: ./api-gestaoconsulta
+      dockerfile: Dockerfile
+    container_name: backend-dev
+    ports:
+      - "${PORT:-7070}:7070"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT:-7070}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+    volumes:
+      - ./api-gestaoconsulta:/app
+      - /app/node_modules
+    networks:
+      - gesto-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frotend-gestaoconsulta
+      dockerfile: Dockerfile
+    container_name: frontend-dev
+    ports:
+      - "${FRONTEND_PORT:-7071}:7071"
+    env_file:
+      - .env
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://10.176.115.76:7070}
+      - VITE_STRIPE_PUBLIC_KEY=${VITE_STRIPE_PUBLIC_KEY}
+      - NODE_ENV=development
+      - PORT=${FRONTEND_PORT:-7071}
+    volumes:
+      - ./frotend-gestaoconsulta:/app
+      - /app/node_modules
+    networks:
+      - gesto-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  gesto-network:
+    driver: bridge
