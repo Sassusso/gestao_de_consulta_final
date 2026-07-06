@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
       - PORT=${PORT:-7070}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - FRONTEND_URL=${FRONTEND_URL:-http://10.0.0.4:7071}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_SECURE=${SMTP_SECURE}
@@ -39,7 +39,7 @@ services:
     env_file:
       - .env
     environment:
-      - VITE_API_URL=${VITE_API_URL:-http://10.176.115.76:7070}
+      - VITE_API_URL=${VITE_API_URL:-http://10.0.0.4:7070}
       - VITE_STRIPE_PUBLIC_KEY=${VITE_STRIPE_PUBLIC_KEY}
       - NODE_ENV=development
       - PORT=${FRONTEND_PORT:-7071}
