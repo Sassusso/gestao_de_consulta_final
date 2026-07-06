@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+enum AppointmentType {
+  PRIVATE
+  PLAN
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum NotificationType {
+  CONSULTA_CRIADA
+  CONSULTA_CANCELADA
+  CONSULTA_REMARCADA
+  LEMBRETE_CONSULTA
+  PAGAMENTO_CONFIRMADO
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// MODELS 
+model User {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String     @unique
+  password  String
+  phone     String?
+  role      UserRole   @default(PATIENT)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  patient Patient?
+  doctor  Doctor?
+}
+
+model Patient {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String    @unique @db.ObjectId
+  dateOfBirth    DateTime?
+  sex            String? // "M", "F", "OTHER"
+  address        String?
+  emergencyPhone String?
+  bloodGroup     String?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Doctor {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String    @unique @db.ObjectId
+  specialtyId    String    @db.ObjectId
+  specialty      Specialty @relation(fields: [specialtyId], references: [id])
+  medicalLicense String    @unique
+  availability   Json?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Specialty {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String   @unique
+  pricePrivate Float // preço para consulta particular
+  pricePlan    Float // preço para consulta por plano
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctors Doctor[]
+
+  @@map("specialties")
+}
+
+model Appointment {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  patientId String            @db.ObjectId
+  doctorId  String            @db.ObjectId
+  dateTime  DateTime
+  status    AppointmentStatus @default(SCHEDULED)
+  reason    String
+  notes     String?
+  type      AppointmentType // PRIVATE ou PLAN
+  amount    Float // preço calculado no momento da criação
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  patient       Patient        @relation(fields: [patientId], references: [id])
+  doctor        Doctor         @relation(fields: [doctorId], references: [id])
+  payment       Payment?
+  medicalRecord MedicalRecord?
+  notifications Notification[]
+}
+
+model Payment {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  appointmentId  String        @unique @db.ObjectId
+  appointment    Appointment   @relation(fields: [appointmentId], references: [id])
+  amount         Float
+  method         String? // "stripe", "card", etc.
+  status         PaymentStatus @default(PENDING)
+  transactionRef String? // guarda o id do PaymentIntent
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model MedicalRecord {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  appointmentId  String   @unique @db.ObjectId
+  diagnosis      String
+  prescription   String?
+  requestedExams String?
+  medicalNotes   String?
+  recordedAt     DateTime @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model Notification {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String             @db.ObjectId
+  appointmentId String             @db.ObjectId
+  appointment   Appointment        @relation(fields: [appointmentId], references: [id])
+  type          NotificationType
+  title         String
+  message       String
+  status        NotificationStatus @default(PENDING)
+  sentAt        DateTime?
+  read          Boolean            @default(false)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("notifications")
+}
