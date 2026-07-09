@@ -15,6 +15,11 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 7071,        
+    port: 7071,
+    allowedHosts: [
+      'localhost',
+      '.traefik.me',  // Permite todos os subdomínios .traefik.me
+      'sassus-medical.traefik.me'
+    ]        
   }
 })
