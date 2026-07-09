@@ -18,7 +18,9 @@ export default defineConfig({
     port: 7071,
     allowedHosts: [
       'localhost',
-      '.sslip.io',  // Permite todos os subdomínios .sslip.io
+      '*.sslip.io',
+      '*.traefik.me',
+      '*.ngrok-free.app',  // Permite todos os subdomínios .sslip.io
       'gestaoconsultasmedicas-epizxc-46b025-105-172-106-141.sslip.io'
     ]        
   }
